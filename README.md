@@ -2,10 +2,12 @@
 
 ## Features
 
+```
 [+] Brute forces every possible domain
 [+] Check DNS first and then Whois
 [+] Custom tld's
 [+] Custom domain length
+```
 
 ## Installation
 

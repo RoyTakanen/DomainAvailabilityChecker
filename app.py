@@ -4,9 +4,14 @@ import whois
 
 def check_domain_availability(combinations, tld):
     for combination in combinations:
-        domain = ''.join(combination) + "." + tld
+        if type(combination) is tuple:
+            domain = ''.join(combination) + "." + tld
+        else:
+            domain = combination + "." + tld
 
         #print("DNS checking...", domain)
+
+        available = False
 
         try:
             ip = socket.gethostbyname(domain)
@@ -18,11 +23,12 @@ def check_domain_availability(combinations, tld):
                 if whois_data == None:
                     #print(domain + ",0.0.0.0,true")
                     print("[+]", domain)
-                    break
+                    available = True
             except:
                 pass
                 #print("Darn utf-8!")
-        print("[-]", domain)
+        if not available:
+            print("[-]", domain)
 def main():
     # TODO: csv and/or json outputs
 
@@ -55,33 +61,56 @@ Features:
         all_characters = 'abcdefghijklmnopqrstuvwxyz'
         all_numbs = '1234567890'
 
-        print("Select character lists to the combination generator.")
-        print("These should be separated by comma and/or space. Example: 1, 2")
+        print("Do you want to")
+        print("1. Generate combinations and check them")
+        print("2. Use wordlist")
 
-        print()
-        print("Character lists:")
-        print()
+        list_type = input("Option: ")
+        if "1" in list_type:
 
-        print("1.", all_characters)
-        print("2.", all_numbs)
+            print("Select character lists to the combination generator.")
+            print("These should be separated by comma and/or space. Example: 1, 2")
 
-        print()
+            print()
+            print("Character lists:")
+            print()
 
-        selection = input("Character lists: ").replace(",", " ").split()
+            print("1.", all_characters)
+            print("2.", all_numbs)
 
-        print()
+            print()
 
-        character_list = ""
+            selection = input("Character lists: ").replace(",", " ").split()
 
-        for selected in selection:
-            if selected == "1":
-                character_list += all_characters
-            if selected == "2":
-                character_list += all_numbs
+            print()
 
-        domain_length = int(input("Enter domain length: "))
+            character_list = ""
 
-        combinations = itertools.product(*([character_list] * domain_length))
+            for selected in selection:
+                if selected == "1":
+                    character_list += all_characters
+                if selected == "2":
+                    character_list += all_numbs
+
+            domain_length = int(input("Enter domain length: "))
+
+            combinations = itertools.product(*([character_list] * domain_length))
+        elif "2" in list_type:
+            # Make it possible to use wordlists from pastebin.fi
+            while True:
+                print("Enter wordlist file path")
+
+                path = input("Path: ")
+
+                try:
+                    f = open(path, "r")
+                    combinations = f.read().split("\n")
+                except:
+                    print("Failed to load the list")
+                    continue
+
+                print("Loaded", len(combinations) ,"combinations")
+                break
 
         print()
         print("Starting checking...")
@@ -93,4 +122,7 @@ Features:
         break
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except:
+        print("\nBye!")
